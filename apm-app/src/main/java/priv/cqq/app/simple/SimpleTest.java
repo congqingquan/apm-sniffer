@@ -8,7 +8,9 @@ package priv.cqq.app.simple;
 public class SimpleTest {
 
     /**
-     *  -javaagent:D:\development\idea\workspace\personal\apm-sinffer\apm-agent\target\plugins-dist\apm-agent-1.0-SNAPSHOT-jar-with-dependencies.jar
+     *  -javaagent:D:\development\idea\workspace\personal\apm-sniffer\apm-agent\target\plugins-dist\apm-agent-1.0-SNAPSHOT-jar-with-dependencies.jar
+     *
+     *  -javaagent:/Users/congqingquan/development/code/gitee/java/apm-sniffer/apm-agent/target/plugins-dist/apm-agent-1.0-SNAPSHOT-jar-with-dependencies.jar
      */
 
     public static void main(String[] args) {

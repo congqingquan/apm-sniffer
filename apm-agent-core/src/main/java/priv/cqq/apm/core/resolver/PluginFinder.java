@@ -3,7 +3,7 @@ package priv.cqq.apm.core.resolver;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import priv.cqq.apm.core.APMConstants;
-import priv.cqq.apm.core.classloader.APMClassLoader;
+import priv.cqq.apm.core.loader.APMClassLoader;
 import priv.cqq.apm.core.plugin.ClassEnhancePluginDefinition;
 
 import java.io.IOException;

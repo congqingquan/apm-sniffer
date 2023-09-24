@@ -21,7 +21,8 @@ public class APMConstants {
 //        PLUGIN_FOLDER_ABSOLUTE_PATH = pluginFolder.getAbsolutePath();
 
         // TODO Fot test
-         PLUGIN_FOLDER_ABSOLUTE_PATH = "D:\\development\\idea\\workspace\\personal\\apm-sinffer\\apm-agent\\target\\plugins-dist\\plugins";
+//        PLUGIN_FOLDER_ABSOLUTE_PATH = "D:\\development\\idea\\workspace\\personal\\apm-sinffer\\apm-agent\\target\\plugins-dist\\plugins";
+         PLUGIN_FOLDER_ABSOLUTE_PATH = "/Users/congqingquan/development/code/gitee/java/apm-sniffer/apm-agent/target/plugins-dist/plugins";
     }
 
     // config file name of apm plugin

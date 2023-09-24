@@ -1,12 +1,11 @@
-package priv.cqq.apm.core.classloader;
+package priv.cqq.apm.core.loader;
 
-import priv.cqq.apm.core.APMConstants;
+import lombok.Getter;
 import priv.cqq.apm.core.utils.FileUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,18 +16,28 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class APMClassLoader extends ClassLoader {
-
+    
+    static {
+        // Able to load class parallelly
+        ClassLoader.registerAsParallelCapable();
+    }
+    
+    @Getter
+    private static volatile APMClassLoader instance;
+    
+    public static void init(ClassLoader parent, String... classpath) {
+        if (instance == null) {
+            synchronized (APMClassLoader.class) {
+                if (instance == null) {
+                    instance = new APMClassLoader(parent, classpath);
+                }
+            }
+        }
+    }
+    
     private final List<String> classpath;
 
     private final List<JarFileWrapper> pluginJarFiles;
-
-    public APMClassLoader() {
-        this(MethodHandles.lookup().lookupClass().getClassLoader());
-    }
-
-    public APMClassLoader(ClassLoader parent) {
-        this(parent, APMConstants.PLUGIN_FOLDER_ABSOLUTE_PATH);
-    }
 
     public APMClassLoader(ClassLoader parent, String... classpath) {
         super(parent);
