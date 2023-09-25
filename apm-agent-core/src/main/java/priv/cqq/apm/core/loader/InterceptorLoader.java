@@ -1,5 +1,7 @@
 package priv.cqq.apm.core.loader;
 
+import priv.cqq.apm.core.APMConstants;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,9 +13,10 @@ public class InterceptorLoader {
     // key: enhanced type class loader / value: interceptor apm class loader
     private static final Map<ClassLoader, ClassLoader> ENHANCED_TYPE_WITH_INTERCEPTOR_CLASSLOADER_MAP = new HashMap<>();
     
-    public static <T> T load(String className, ClassLoader enhancedTypeCLassLoader) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        String instanceKey = className + "_OF_" + enhancedTypeCLassLoader.getClass().getName() + "@" + Integer.toHexString(enhancedTypeCLassLoader.hashCode());
-        Object interceptor = INTERCEPTOR_CACHE.get(instanceKey);
+    public static <T> T load(String interceptorClassName, ClassLoader enhancedTypeCLassLoader) {
+        String interceptorKey =
+                interceptorClassName + "_OF_" + enhancedTypeCLassLoader.getClass().getName() + "@" + Integer.toHexString(enhancedTypeCLassLoader.hashCode());
+        Object interceptor = INTERCEPTOR_CACHE.get(interceptorKey);
         if (interceptor != null) {
             return (T) interceptor;
         }
@@ -28,13 +31,18 @@ public class InterceptorLoader {
                 // loader of enhanced type.
                 
                 // Special that create APMClassLoader just once for interceptors from the same classloader
-                interceptorAPMClassLoader = new APMClassLoader(enhancedTypeCLassLoader);
+                interceptorAPMClassLoader = new APMClassLoader(enhancedTypeCLassLoader, APMConstants.PLUGIN_FOLDER_ABSOLUTE_PATH);
                 ENHANCED_TYPE_WITH_INTERCEPTOR_CLASSLOADER_MAP.put(enhancedTypeCLassLoader, interceptorAPMClassLoader);
             }
         }
-        
-        Object interceptorInstance = Class.forName(className, true, interceptorAPMClassLoader).newInstance();
-        INTERCEPTOR_CACHE.put(instanceKey, interceptorInstance);
+
+        Object interceptorInstance;
+        try {
+            interceptorInstance = Class.forName(interceptorClassName, true, interceptorAPMClassLoader).newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            throw new RuntimeException("Cannot load interceptor class for new instance. Interceptor class: " + interceptorClassName, e);
+        }
+        INTERCEPTOR_CACHE.put(interceptorKey, interceptorInstance);
         return (T) interceptorInstance;
     }
 }

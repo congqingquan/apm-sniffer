@@ -4,7 +4,7 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import priv.cqq.apm.core.plugin.ClassEnhancePluginDefinition;
-import priv.cqq.apm.core.plugin.InstanceMethodInterceptPoint;
+import priv.cqq.apm.core.plugin.interceptor.InstanceMethodInterceptPoint;
 
 import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
 import static net.bytebuddy.matcher.ElementMatchers.nameEndsWith;

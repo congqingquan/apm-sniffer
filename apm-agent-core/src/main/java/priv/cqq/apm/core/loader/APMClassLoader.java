@@ -34,9 +34,11 @@ public class APMClassLoader extends ClassLoader {
             }
         }
     }
-    
+
+    @Getter
     private final List<String> classpath;
 
+    @Getter
     private final List<JarFileWrapper> pluginJarFiles;
 
     public APMClassLoader(ClassLoader parent, String... classpath) {
@@ -53,16 +55,6 @@ public class APMClassLoader extends ClassLoader {
             }));
         }
     }
-
-    public List<String> getClasspath() {
-        return classpath;
-    }
-
-    public List<JarFileWrapper> getPluginJarFiles() {
-        return pluginJarFiles;
-    }
-
-    // ================================================================================
 
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {

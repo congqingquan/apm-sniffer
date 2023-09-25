@@ -1,32 +1,26 @@
 package priv.cqq.apm.plugin.spring;
 
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bind.annotation.AllArguments;
-import net.bytebuddy.implementation.bind.annotation.Origin;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
-import net.bytebuddy.implementation.bind.annotation.SuperCall;
-import net.bytebuddy.implementation.bind.annotation.This;
+import priv.cqq.apm.core.plugin.interceptor.enhance.InstanceMethodsAroundInterceptor;
 
-import java.util.Arrays;
-import java.util.concurrent.Callable;
+import java.lang.reflect.Method;
 
 @Slf4j
-public class TimingInterceptor {
+public class TimingInterceptor implements InstanceMethodsAroundInterceptor {
 
-    @RuntimeType
-    public Object timing(
-            @Origin Class<?> targetClass,
-            @Origin String sourceMethodInstanceToString,
-            @This Object target,
-            @AllArguments Object[] allArgs,
-            @SuperCall Callable<Object> controller) throws Exception {
+    @Override
+    public void beforeMethod(Object target, Method method, Object[] allArguments, Class<?>[] argumentsTypes) throws Throwable {
 
-        long start = System.currentTimeMillis();
-        try {
-            return controller.call();
-        } finally {
-            long end = System.currentTimeMillis();
-            log.info("Timing {} millis of {}-{}", end - start, sourceMethodInstanceToString, Arrays.toString(allArgs));
-        }
+    }
+
+    @Override
+    public Object afterMethod(Object target, Method method, Object[] allArguments, Class<?>[] argumentsTypes, Object ret) throws Throwable {
+        log.info("after method. method name [{}], ret [{}]", method.getName(), ret);
+        return ret;
+    }
+
+    @Override
+    public void handleMethodException(Object target, Method method, Object[] allArguments, Class<?>[] argumentsTypes, Throwable t) {
+        log.info("Timing interceptor: handel method exception. method name [{}]", method.getName(), t);
     }
 }

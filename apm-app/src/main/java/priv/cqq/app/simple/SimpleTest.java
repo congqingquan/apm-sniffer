@@ -15,6 +15,6 @@ public class SimpleTest {
 
     public static void main(String[] args) {
         Executor executor = new Executor();
-        executor.execute();
+        executor.execute("arg1", "arg2");
     }
 }

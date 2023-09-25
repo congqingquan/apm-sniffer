@@ -4,7 +4,7 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import priv.cqq.apm.core.plugin.ClassEnhancePluginDefinition;
-import priv.cqq.apm.core.plugin.InstanceMethodInterceptPoint;
+import priv.cqq.apm.core.plugin.interceptor.InstanceMethodInterceptPoint;
 
 import static net.bytebuddy.matcher.ElementMatchers.any;
 import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
@@ -14,7 +14,7 @@ public class LogInstrumentation extends ClassEnhancePluginDefinition {
 
     @Override
     public ElementMatcher.Junction<? super TypeDescription> classMatcher() {
-        return isAnnotatedWith(named("jdk.nashorn.internal.runtime.logging.Logger"));
+        return any();
     }
 
     @Override
@@ -23,7 +23,7 @@ public class LogInstrumentation extends ClassEnhancePluginDefinition {
                 new InstanceMethodInterceptPoint() {
                     @Override
                     public ElementMatcher<? super MethodDescription> instanceMethodMatcher() {
-                        return any();
+                        return isAnnotatedWith(named("jdk.nashorn.internal.runtime.logging.Logger"));
                     }
 
                     @Override

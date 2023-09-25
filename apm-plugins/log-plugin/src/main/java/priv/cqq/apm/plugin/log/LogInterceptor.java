@@ -1,29 +1,27 @@
 package priv.cqq.apm.plugin.log;
 
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bind.annotation.AllArguments;
-import net.bytebuddy.implementation.bind.annotation.Origin;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
-import net.bytebuddy.implementation.bind.annotation.SuperCall;
-import net.bytebuddy.implementation.bind.annotation.This;
+import priv.cqq.apm.core.plugin.interceptor.enhance.InstanceMethodsAroundInterceptor;
 
-import java.util.concurrent.Callable;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 @Slf4j
-public class LogInterceptor {
+public class LogInterceptor implements InstanceMethodsAroundInterceptor {
 
-    @RuntimeType
-    public Object log(
-            @Origin Class<?> targetClass,
-            @Origin String sourceMethodInstanceToString,
-            @This Object target,
-            @AllArguments Object[] allArgs,
-            @SuperCall Callable<Object> callable) throws Exception {
-        log.info("apm log: before call method. target: {}, class loader: {}", target, target.getClass().getClassLoader());
-        try {
-            return callable.call();
-        } finally {
-            log.info("apm log: after call method");
-        }
+    @Override
+    public void beforeMethod(Object target, Method method, Object[] allArguments, Class<?>[] argumentsTypes) throws Throwable {
+        log.info("Log interceptor: before method. method name [{}], allArguments [{}]", method.getName(), Arrays.toString(allArguments));
+    }
+
+    @Override
+    public Object afterMethod(Object target, Method method, Object[] allArguments, Class<?>[] argumentsTypes, Object ret) throws Throwable {
+        log.info("Log interceptor: after method. method name [{}], ret [{}]", method.getName(), ret);
+        return ret;
+    }
+
+    @Override
+    public void handleMethodException(Object target, Method method, Object[] allArguments, Class<?>[] argumentsTypes, Throwable t) {
+        log.info("Log interceptor: handel method exception. method name [{}]", method.getName(), t);
     }
 }

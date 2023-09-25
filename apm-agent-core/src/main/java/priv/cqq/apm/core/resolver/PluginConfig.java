@@ -1,5 +1,7 @@
 package priv.cqq.apm.core.resolver;
 
+import lombok.Getter;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,11 +12,8 @@ public enum PluginConfig {
 
     INSTANCE;
 
+    @Getter
     private final List<PluginDefinition> configs = new ArrayList<>();
-
-    public List<PluginDefinition> getConfigs() {
-        return configs;
-    }
 
     public void load(InputStream inputStream) {
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {

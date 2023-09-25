@@ -2,16 +2,15 @@ package priv.cqq.app.simple;
 
 import jdk.nashorn.internal.runtime.logging.Logger;
 
-/**
- * Created by QQ.Cong on 2023-09-22 / 14:53
- *
- * @Description
- */
-@Logger
+import java.util.Arrays;
+
 public class Executor {
 
-    public void execute() {
-        System.out.println("execute...");
+    @Logger
+    public String execute(String... args) {
+        System.out.println("execute -> args: " + Arrays.toString(args));
+        // int i = 1/ 0;
+        return "success";
     }
 
 }
