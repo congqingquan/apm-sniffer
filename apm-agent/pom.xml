@@ -39,7 +39,23 @@
         </dependency>
     </dependencies>
 
+
+    <properties>
+        <output-dist>${project.build.directory}/apm-dist</output-dist>
+    </properties>
+
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.yml</include>
+                </includes>
+                <!-- 启用过滤器：过滤器会解析需要过滤的的资源文件，将内部的变量替换成真实的值 -->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <!-- 1. Agent -->
             <plugin>
@@ -81,7 +97,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <delete dir="${project.basedir}/../plugins-dist" />
+                                <delete dir="${output-dist}" />
                             </target>
                         </configuration>
                     </execution>
@@ -93,12 +109,10 @@
                         </goals>
                         <configuration>
                             <target>
-                                <property name="dist">${project.build.directory}/plugins-dist</property>
-
-                                <mkdir dir="${dist}"/>
+                                <mkdir dir="${output-dist}"/>
                                 <copy file="${project.build.directory}/${build.finalName}-jar-with-dependencies.jar"
-                                      tofile="${dist}/${build.finalName}-jar-with-dependencies.jar"/>
-                                <mkdir dir="${dist}/plugins"/>
+                                      tofile="${output-dist}/${build.finalName}.jar"/>
+                                <mkdir dir="${output-dist}/plugins"/>
                             </target>
                         </configuration>
                     </execution>

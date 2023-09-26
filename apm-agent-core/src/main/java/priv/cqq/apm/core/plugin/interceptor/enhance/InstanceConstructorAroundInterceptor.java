@@ -12,15 +12,6 @@ import java.lang.reflect.Constructor;
 @Slf4j
 public class InstanceConstructorAroundInterceptor {
 
-    /**
-         .intercept(
-             SuperMethodCall.INSTANCE
-             .andThen(
-             MethodDelegation.withDefaultConfiguration().filter(named("afterConstruct")).to(ConstructorDelegateTarget.class)
-             )
-         )
-     */
-
     private final InstanceConstructorInterceptor interceptor;
 
     public InstanceConstructorAroundInterceptor(String interceptorClassName, ClassLoader classLoader) {
@@ -28,13 +19,11 @@ public class InstanceConstructorAroundInterceptor {
     }
 
     @RuntimeType
-    public void intercept(@Origin Constructor<?> constructor, @This Object target, @AllArguments Object[] allArguments) {
+    public void intercept(@Origin Constructor<?> constructor, @This EnhancedInstance target, @AllArguments Object[] allArguments) {
         try {
-            // EnhancedInstance targetObject = (EnhancedInstance) obj;
             interceptor.onConstruct(target, allArguments);
         } catch (Throwable throwable) {
             log.error("Class [{}] after constructor [{}] interceptor failure", target.getClass(), constructor.getName(), throwable);
         }
-
     }
 }

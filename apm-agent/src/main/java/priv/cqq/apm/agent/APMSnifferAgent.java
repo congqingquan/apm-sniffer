@@ -27,6 +27,7 @@ public class APMSnifferAgent {
                         .or(nameStartsWith("sun.reflect"))
                         .or(ElementMatchers.isSynthetic())
                 )
+                // rebase
                 .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                 .type(PluginFinder.buildPluginTypeJunction())
                 .transform(new APMTransform())

@@ -29,7 +29,7 @@ public class ControllerInstrumentation extends ClassEnhancePluginDefinition {
 
                     @Override
                     public String interceptorClassName() {
-                        return "priv.cqq.apm.core.plugin.TimingInterceptor";
+                        return "priv.cqq.apm.plugin.spring.TimingInterceptor";
                     }
                 }
         };

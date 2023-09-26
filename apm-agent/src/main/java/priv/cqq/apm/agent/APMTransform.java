@@ -2,8 +2,11 @@ package priv.cqq.apm.agent;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.modifier.FieldManifestation;
+import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.SuperMethodCall;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -12,6 +15,7 @@ import priv.cqq.apm.core.plugin.ClassEnhancePluginDefinition;
 import priv.cqq.apm.core.plugin.interceptor.InstanceConstructorInterceptPoint;
 import priv.cqq.apm.core.plugin.interceptor.InstanceMethodInterceptPoint;
 import priv.cqq.apm.core.plugin.interceptor.StaticMethodInterceptPoint;
+import priv.cqq.apm.core.plugin.interceptor.enhance.EnhancedInstance;
 import priv.cqq.apm.core.plugin.interceptor.enhance.InstanceConstructorAroundInterceptor;
 import priv.cqq.apm.core.plugin.interceptor.enhance.InstanceMethodInterceptor;
 import priv.cqq.apm.core.plugin.interceptor.enhance.StaticMethodInterceptor;
@@ -31,12 +35,23 @@ public class APMTransform implements AgentBuilder.Transformer {
                                             ClassLoader classLoader,
                                             JavaModule module,
                                             ProtectionDomain protectionDomain) {
+        // define dynamic field
+        builder = defineDynamicField(typeDescription, builder);
         // register constructor matcher
         builder = registerConstructorMatcher(classLoader, builder);
         // register instance method matcher
         builder = registerInstanceMethodMatcher(classLoader, builder);
         // register static method matcher
         builder = registerStaticMethodMatcher(classLoader, builder);
+        return builder;
+    }
+
+    private DynamicType.Builder<?> defineDynamicField(TypeDescription typeDescription, DynamicType.Builder<?> builder) {
+        if (!typeDescription.isAssignableTo(EnhancedInstance.class)) {
+            return builder.defineField(EnhancedInstance.CONTEXT_ATTR_NAME, Object.class, Visibility.PRIVATE, FieldManifestation.VOLATILE)
+                        .implement(EnhancedInstance.class)
+                        .intercept(FieldAccessor.ofField(EnhancedInstance.CONTEXT_ATTR_NAME));
+        }
         return builder;
     }
 
@@ -67,12 +82,13 @@ public class APMTransform implements AgentBuilder.Transformer {
     private DynamicType.Builder<?> registerInstanceMethodMatcher(ClassLoader classLoader, DynamicType.Builder<?> builder) {
         for (ClassEnhancePluginDefinition classEnhancePluginDefinition : PluginFinder.getClassEnhancePluginDefinitions()) {
             InstanceMethodInterceptPoint[] instanceMethodInterceptPoints = classEnhancePluginDefinition.instanceMethodInterceptPoints();
+
             for (InstanceMethodInterceptPoint instanceMethodInterceptPoint : instanceMethodInterceptPoints) {
 
                 ElementMatcher<? super MethodDescription> instanceMethodMatcher =
                         not(isStatic()).and(not(isConstructor())).and(instanceMethodInterceptPoint.instanceMethodMatcher());
 
-                // TODO 待解决：Enhanced class 被 APPClassLoader 加载。且增强后的字节码中依赖 APMClassLoader 加载的插件拦截器。
+                // 注意点1：Enhanced class 被 APPClassLoader 加载，且增强后的字节码中依赖子类加载器 APMClassLoader 加载的插件拦截器。
                 //  那么 APPClassLoader 肯定找不到插件拦截器。即如何结果 APPClasLoader 中访问到 APMClassLoader 中的类？
 
                 // 需要在 agent-core 中抽象出一层拦截器，并定义拦截器接口，具体的实现在 plugin jar 中。
@@ -83,10 +99,10 @@ public class APMTransform implements AgentBuilder.Transformer {
 
                 // 总结下来即：不去搜索无法被 APPClassLoader 找到的 plugin jar 中的类，利用一个可以被搜索到的接口来接收无法被 APPClassLoader 找到的类！
                 // InstanceMethodsInterceptor(Loaded by AppClassLoader) interceptor = Instance of interceptorImpl(Loaded by APMClassLoader)
-                // 在总结一下：如何在父类加载器加载的类中，引用子类加载器加载的类？理解多态抽象出一个接口或者抽象类来接收即可。
+                // 在总结一下：如何在父类加载器加载的类中，引用子类加载器加载的类？定义一个接口或者抽象类来接收无法被加载的类即可。
 
                 String interceptorClassName = instanceMethodInterceptPoint.interceptorClassName();
-                // 注意点：
+                // 注意点2：
                 // 实例化 Interceptor 时使用的 ClassLoader 的 ParentClassLoader 应该为 Enhance class 的 ClassLoader。
                 // 这样才能使得拦截器中能正常访问被增强类，虽然 APMClassLoader 加载不到 Enhance class，但会委派加载 Enhance class 的 ClassLoader 加载 Enhance class。
                 builder = builder.method(instanceMethodMatcher).intercept(

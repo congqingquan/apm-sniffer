@@ -22,7 +22,7 @@ public class InstanceMethodInterceptor {
 
     @RuntimeType
     public Object intercept(
-            @This Object target,
+            @This EnhancedInstance target,
             @Origin Method method,
             @AllArguments Object[] allArguments,
             @SuperCall Callable<Object> callable) throws Exception {

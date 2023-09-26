@@ -1,11 +1,13 @@
 package priv.cqq.apm.core.loader;
 
+import lombok.extern.slf4j.Slf4j;
 import priv.cqq.apm.core.APMConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class InterceptorLoader {
     
     private static final ConcurrentHashMap<String, Object> INTERCEPTOR_CACHE = new ConcurrentHashMap<String, Object>();
@@ -40,6 +42,7 @@ public class InterceptorLoader {
         try {
             interceptorInstance = Class.forName(interceptorClassName, true, interceptorAPMClassLoader).newInstance();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            log.error("Cannot load interceptor class for new instance. Interceptor class: {}", interceptorClassName, e);
             throw new RuntimeException("Cannot load interceptor class for new instance. Interceptor class: " + interceptorClassName, e);
         }
         INTERCEPTOR_CACHE.put(interceptorKey, interceptorInstance);

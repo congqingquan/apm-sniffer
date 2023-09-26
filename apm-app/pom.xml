@@ -63,7 +63,6 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>priv.cqq.app.spring.BackendAppApplication</mainClass>
-                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>
