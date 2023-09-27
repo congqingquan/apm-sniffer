@@ -22,17 +22,15 @@ public class InterceptorLoader {
         if (interceptor != null) {
             return (T) interceptor;
         }
-        
+
         ClassLoader interceptorAPMClassLoader;
         synchronized (InterceptorLoader.class) {
             interceptorAPMClassLoader = ENHANCED_TYPE_WITH_INTERCEPTOR_CLASSLOADER_MAP.get(enhancedTypeCLassLoader);
             if (interceptorAPMClassLoader == null) {
                 // Why create a new APMClassLoader?
-                // First: Maybe enhanced types are from different class loader.
-                // Second: Maybe the parent class loader of APMClassLoader which returned by call APMClassLoader.getInstance differs from class
-                // loader of enhanced type.
+                // Ensure that the classes enhanced are loader by the same class loader as the interceptors in the plugin jar loaded by the APMClassLoader
                 
-                // Special that create APMClassLoader just once for interceptors from the same classloader
+                // Special that create APMClassLoader just once for every different class loader of enhanced type
                 interceptorAPMClassLoader = new APMClassLoader(enhancedTypeCLassLoader, APMConstants.PLUGIN_FOLDER_ABSOLUTE_PATH);
                 ENHANCED_TYPE_WITH_INTERCEPTOR_CLASSLOADER_MAP.put(enhancedTypeCLassLoader, interceptorAPMClassLoader);
             }
